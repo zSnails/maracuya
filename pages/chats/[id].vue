@@ -5,24 +5,33 @@
         <a class="btn btn-ghost text-xl">{{ recipient?.peer?.email }}</a>
       </div>
     </nav>
-    <section class="w-full max-h-full shadow-inner overflow-auto bg-base-300">
-      <MessageBlock v-for="(msg, idx) in messages" :key="idx" :message="msg" :deletable="msg.sent_by === user?.id" />
+    <!-- <section class="w-full max-h-full shadow-inner overflow-auto bg-base-300"> -->
+    <section ref="messageArea" class="shadow-inner overflow-auto bg-base-300">
+      <div v-for="(msg, idx) in messages" :key="idx" class="chat"
+        :class="{ 'chat-start': msg.sent_by !== user?.id, 'chat-end': msg.sent_by === user?.id }">
+        <div class="chat-bubble">{{ msg.content }}</div>
+        <div v-if="msg.media" class="chat-footer">
+          <img class="object-scale-down w-48 rounded-xl" :src="msg.media" alt="Some Media">
+        </div>
+      </div>
     </section>
-    <div class="join m-5">
+    <form @submit.prevent class="join m-5">
+      <input class="file-input join-item" type="file" accept="image/*, video/*">
       <input type="text" v-model="messageContent" class="input join-item w-full bg-base-200"
-        :placeholder="`Message @${recipient?.peer?.email}`">
-
-      <button type="submit" class="btn join-item" @click="sendMessage">
+        :placeholder="`Message @${recipient?.peer?.email}`" required>
+      <button type="submit" class="btn join-item" :class="{ 'btn-disabled': messageContent.length === 0 }"
+        @click="sendMessage">
         <PaperAirplaneIcon class="size-6 fg-base-200"></PaperAirplaneIcon>
       </button>
-    </div>
+    </form>
   </div>
 </template>
 <script setup lang="ts">
 import { type Message } from '~/message';
-import MessageBlock from '~/components/MessageBlock.vue';
 import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
+
+const messageArea = ref<HTMLTableSectionElement>();
 
 export interface Root {
   id?: number
@@ -40,6 +49,7 @@ const user = useSupabaseUser();
 const messageContent = ref("");
 const supabase = useSupabaseClient<Database>();
 const sendMessage = async () => {
+  if (messageContent.value.length === 0) return;
   const resp = await supabase.from("messages").insert(
     {
       sent_by: user.value?.id as string,
