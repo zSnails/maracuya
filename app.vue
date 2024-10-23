@@ -1,6 +1,5 @@
 <template>
   <main class="flex flex-row h-[100dvh] bg-base-100">
-    <!-- flex flex-col items-center justify-start -->
     <aside v-if="user" class="grid grid-rows-[auto_1fr_auto] h-full  rounded-box bg-base-200 w-[350px]">
       <h1 class="text-5xl font-bold m-5">Maracuyá</h1>
       <ul class="join menu w-full flex flex-col gap-1">
