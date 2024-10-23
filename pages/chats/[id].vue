@@ -17,7 +17,7 @@
     </section>
     <form @submit.prevent class="join m-5">
       <input class="file-input join-item" type="file" accept="image/*, video/*">
-      <input type="text" v-model="messageContent" class="input join-item w-full bg-base-200"
+      <input type="text" v-model="messageContent" class="input flex-1 join-item w-full bg-base-200"
         :placeholder="`Message @${recipient?.peer?.email}`" required>
       <button type="submit" class="btn join-item" :class="{ 'btn-disabled': messageContent.length === 0 }"
         @click="sendMessage">
@@ -31,7 +31,7 @@ import { type Message } from '~/message';
 import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
 
-const messageArea = ref<HTMLTableSectionElement>();
+const messageArea = ref<HTMLTableSectionElement>() as Ref<HTMLTableSectionElement>;
 
 export interface Root {
   id?: number
@@ -64,10 +64,8 @@ const sendMessage = async () => {
   }
 };
 
-console.log('recipient.id', recipient?.id);
 const preloaded = await supabase.from("messages").select("*").eq("conversation", recipient?.id as number).order("created_at");
 const messages = ref(preloaded.data);
-console.log(messages.value);
 
 supabase.channel('schema-db-changes')
   .on(
@@ -77,7 +75,19 @@ supabase.channel('schema-db-changes')
       schema: 'public',
       table: 'messages',
     },
-    (payload) => messages.value?.push(payload.new as Message)
+    (payload) => {
+      const scroll = (messageArea.value.scrollTop + messageArea.value.offsetHeight) / messageArea.value.scrollHeight;
+      messages.value?.push(payload.new as Message);
+
+      if (scroll === 1) {
+        nextTick(() => {
+          messageArea.value.scroll({
+            top: messageArea.value.scrollHeight + 64,
+            behavior: "smooth",
+          });
+        });
+      }
+    }
   )
   .subscribe();
 </script>
