@@ -8,8 +8,11 @@
             :email="chat?.peer?.email as string" :id="parseInt(chat?.peer?.id as string) as number" />
         </li>
       </ul>
-      <section>
-
+      <section class="flex flex-row items-center justify-between rounded-box bg-base-300 p-2">
+        <NuxtLink class="btn p-2 border-transparent bg-base-300" href="/me">{{ user.email }}</NuxtLink>
+        <NuxtLink class="btn p-2" href="/settings">
+          <Cog6ToothIcon class="size-6 hover:animate-spin" />
+        </NuxtLink>
       </section>
     </aside>
     <NuxtPage v-if="selected && chats" class="flex-1" :data="chats[selected - 1]" />
@@ -18,6 +21,7 @@
 </template>
 <script setup lang="ts">
 import ChatButton from '~/components/ChatButton.vue';
+import { Cog6ToothIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
 
 const user = useSupabaseUser();
