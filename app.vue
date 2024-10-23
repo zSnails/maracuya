@@ -5,7 +5,7 @@
       <ul class="join menu w-full flex flex-col gap-1">
         <li v-if="chats" v-for="(chat, idx) in chats" :key="chat?.peer?.id as string" class="w-full">
           <ChatButton @click="selected = idx + 1" :class="{ active: idx + 1 === selected }"
-            :email="chat?.peer?.email as string" :id="parseInt(chat?.peer?.id as string) as number" />
+            :email="chat?.peer?.email as string" :id="chat?.id" />
         </li>
       </ul>
       <section class="flex flex-row items-center justify-between rounded-box bg-base-300 p-2">
