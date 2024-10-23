@@ -16,7 +16,7 @@
       </section>
     </aside>
     <NuxtPage v-if="selected && chats" class="flex-1" :data="chats[selected - 1]" />
-    <NuxtPage v-else class="flex-1" />
+    <NuxtPage v-else-if="!user" class="flex-1" />
   </main>
 </template>
 <script setup lang="ts">
