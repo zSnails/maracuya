@@ -90,4 +90,7 @@ supabase.channel('schema-db-changes')
     }
   )
   .subscribe();
+onMounted(() => {
+  messageArea.value.scrollTop = messageArea.value.scrollHeight;
+});
 </script>
