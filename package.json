@@ -13,6 +13,7 @@
     "@heroicons/vue": "^2.1.5",
     "@nuxtjs/supabase": "^1.4.1",
     "@nuxtjs/tailwindcss": "^6.12.2",
+    "date-fns": "^4.1.0",
     "nuxt": "^3.13.2",
     "vue": "latest",
     "vue-router": "latest"
