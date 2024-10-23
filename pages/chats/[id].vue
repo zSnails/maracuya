@@ -5,33 +5,33 @@
         <a class="btn btn-ghost text-xl">{{ recipient?.peer?.email }}</a>
       </div>
     </nav>
-    <!-- <section class="w-full max-h-full shadow-inner overflow-auto bg-base-300"> -->
     <section ref="messageArea" class="shadow-inner overflow-auto bg-base-300">
       <div v-for="(msg, idx) in messages" :key="idx" class="chat"
         :class="{ 'chat-start': msg.sent_by !== user?.id, 'chat-end': msg.sent_by === user?.id }">
-        <div class="chat-bubble">{{ msg.content }}</div>
-        <div v-if="msg.media" class="chat-footer">
+        <div v-if="msg.media" class="chat-header">
           <img class="object-scale-down w-48 rounded-xl" :src="msg.media" alt="Some Media">
+        </div>
+        <div class="chat-bubble">{{ msg.content }}</div>
+        <div class="chat-footer">
+          {{ formatDistance(msg.created_at, new Date(), { addSuffix: true }) }}
         </div>
       </div>
     </section>
-    <form @submit.prevent class="join m-5">
+    <form @submit.prevent="sendMessage" class="join m-5">
       <input class="file-input join-item" type="file" accept="image/*, video/*">
-      <input type="text" v-model="messageContent" class="input flex-1 join-item w-full bg-base-200"
+      <input ref="messageInput" type="text" v-model="messageContent" class="input flex-1 join-item w-full bg-base-200"
         :placeholder="`Message @${recipient?.peer?.email}`" required>
-      <button type="submit" class="btn join-item" :class="{ 'btn-disabled': messageContent.length === 0 }"
-        @click="sendMessage">
-        <PaperAirplaneIcon class="size-6 fg-base-200"></PaperAirplaneIcon>
-      </button>
     </form>
   </div>
 </template>
 <script setup lang="ts">
 import { type Message } from '~/message';
-import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
+import { formatDistance } from "date-fns";
 
 const messageArea = ref<HTMLTableSectionElement>() as Ref<HTMLTableSectionElement>;
+const messageInput = ref<HTMLInputElement>() as Ref<HTMLInputElement>;
+const route = useRoute();
 
 export interface Root {
   id?: number
