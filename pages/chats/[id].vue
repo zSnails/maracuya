@@ -74,12 +74,13 @@ supabase.channel('schema-db-changes')
       event: 'INSERT',
       schema: 'public',
       table: 'messages',
+      filter: `conversation=eq.${route.params.id}`,
     },
     (payload) => {
       const scroll = (messageArea.value.scrollTop + messageArea.value.offsetHeight) / messageArea.value.scrollHeight;
       messages.value?.push(payload.new as Message);
 
-      if (scroll === 1) {
+      if (scroll >= 0.9) {
         nextTick(() => {
           messageArea.value.scroll({
             top: messageArea.value.scrollHeight + 64,
