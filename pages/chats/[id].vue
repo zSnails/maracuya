@@ -50,22 +50,23 @@ const messageContent = ref("");
 const supabase = useSupabaseClient<Database>();
 const sendMessage = async () => {
   if (messageContent.value.length === 0) return;
-  const resp = await supabase.from("messages").insert(
-    {
-      sent_by: user.value?.id as string,
-      conversation: recipient?.id,
-      content: messageContent.value,
-    }
-  );
-  if (resp.error) {
-    console.error(resp.error);
-  } else {
+  messageInput.value.disabled = true;
+  try {
+    await $fetch(`/api/conversations/${route.params.id}/send`, {
+      method: "POST",
+      body: {
+        content: messageContent.value
+      }
+    });
     messageContent.value = "";
+  } catch (error) {
+    console.error(error);
   }
+  messageInput.value.disabled = false;
 };
 
-const preloaded = await supabase.from("messages").select("*").eq("conversation", recipient?.id as number).order("created_at");
-const messages = ref(preloaded.data);
+const preloaded = await useFetch(`/api/conversations/${route.params.id}/messages`)
+const messages = ref(preloaded.data.value?.data);
 
 supabase.channel('schema-db-changes')
   .on(
