@@ -27,11 +27,11 @@ import { LockClosedIcon, EnvelopeIcon } from '@heroicons/vue/16/solid';
 
 const supabase = useSupabaseClient();
 const loginInfo = ref<{ email: string; password: string; }>({ email: '', password: '' });
+const { replace } = useRouter();
 
 const login = async () => {
-  const status = await supabase.auth.signInWithPassword(loginInfo.value);
-  console.table(status);
+  await supabase.auth.signInWithPassword(loginInfo.value);
+  replace("/");
+  window.location.reload()
 }
-
-
 </script>
