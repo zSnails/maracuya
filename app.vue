@@ -43,35 +43,13 @@ const signOut = async () => {
   }
 };
 
-const loadChats = async () => {
-  const tmpChats = await supabase
-    .from("conversations")
-    .select("id, created_at, peer_a:users!conversations_peer_a_fkey(id, email), peer_b:users!conversations_peer_b_fkey(id, email)")
-    .or(`peer_a.eq.${user.value?.id},peer_b.eq.${user.value?.id}`);
-
-  return tmpChats.data?.map((elem) => {
-    if (elem.peer_a?.id === user.value?.id)
-      return { id: elem.id, peer: elem.peer_b };
-    return { id: elem.id, peer: elem.peer_a };
-  });
-};
-
-
-const chats = ref<{
-  id: number;
-  peer: {
-    id: string | null;
-    email: string | null;
-  } | null;
-}[]>();
-
-if (user.value) {
-  chats.value = await loadChats();
-}
+const fromDb = await useFetch("/api/me");
+const chats = ref(fromDb.data.value?.data);
 
 $listen("user:enter", async (usr: User) => {
   user.value = usr;
-  chats.value = await loadChats();
+  const resp = await $fetch("/api/me");
+  chats.value = resp.data;
 });
 
 const selected = ref<number>(0);
