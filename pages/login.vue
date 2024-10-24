@@ -34,8 +34,8 @@ const { replace } = useRouter();
 const login = async () => {
   const user = await supabase.auth.signInWithPassword(loginInfo.value);
   if (user.data && user.data.user) {
-    replace("/");
     $emit("user:enter", user.data.user);
+    await replace("/");
     return;
   }
   // TODO: show authentication errors
