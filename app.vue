@@ -9,8 +9,13 @@
         </li>
       </ul>
       <section class="flex flex-row items-center justify-between rounded-box bg-base-300 p-2">
-        <NuxtLink class="btn p-2 border-transparent bg-base-300" href="/me">{{ user.email }}</NuxtLink>
-        <NuxtLink class="btn p-2" href="/settings">
+        <div class="dropdown dropdown-top">
+          <div tabindex="0" role="button" class="btn m-1">{{ user.email }}</div>
+          <ul tabindex="0" class="dropdown-content menu rounded-box bg-base-100">
+            <li><button @click="signOut" class="btn btn-error btn-sm btn-wide text-white">Log Off</button></li>
+          </ul>
+        </div>
+        <NuxtLink class="btn btn-square p-2" href="/settings">
           <Cog6ToothIcon class="size-6 hover:animate-spin" />
         </NuxtLink>
       </section>
@@ -25,12 +30,21 @@ import { Cog6ToothIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
 import { type User } from "@supabase/supabase-js";
 
-const { $listen } = useNuxtApp();
+const { $listen, $emit } = useNuxtApp();
+const { replace } = useRouter();
 const user = useSupabaseUser();
-const client = useSupabaseClient<Database>();
+const supabase = useSupabaseClient<Database>();
+
+const signOut = async () => {
+  if (user.value) {
+    await supabase.auth.signOut({ scope: 'global' });
+    $emit("user:exit", user.value);
+    await replace("/login");
+  }
+};
 
 const loadChats = async () => {
-  const tmpChats = await client
+  const tmpChats = await supabase
     .from("conversations")
     .select("id, created_at, peer_a:users!conversations_peer_a_fkey(id, email), peer_b:users!conversations_peer_b_fkey(id, email)")
     .or(`peer_a.eq.${user.value?.id},peer_b.eq.${user.value?.id}`);
