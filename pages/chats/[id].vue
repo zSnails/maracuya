@@ -18,9 +18,12 @@
       </div>
     </section>
     <form @submit.prevent="sendMessage" class="join m-5">
-      <input class="file-input join-item" type="file" accept="image/*, video/*">
-      <input ref="messageInput" type="text" v-model="messageContent" class="input flex-1 join-item w-full bg-base-200"
-        :placeholder="`Message @${recipient?.peer?.email}`" required>
+      <input class="file-input join-item bg-base-200" type="file" accept="image/*, video/*">
+      <div class="input flex items-center justify-between join-item bg-base-200 w-full">
+        <input ref="messageInput" type="text" v-model="messageContent" class="flex-1"
+          :placeholder="`Message @${recipient?.peer?.email}`" required>
+        <PaperAirplaneIcon class="size-6" />
+      </div>
     </form>
   </div>
 </template>
@@ -28,6 +31,7 @@
 import { type Message } from '~/message';
 import type { Database } from '~/types/supabase';
 import { formatDistance } from "date-fns";
+import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
 
 const messageArea = ref<HTMLTableSectionElement>() as Ref<HTMLTableSectionElement>;
 const messageInput = ref<HTMLInputElement>() as Ref<HTMLInputElement>;
