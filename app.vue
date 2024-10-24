@@ -37,7 +37,6 @@ const chats = tmpChats.data?.map((elem) => {
   return { id: elem.id, peer: elem.peer_a };
 });
 
-
 const selected = ref<number>(0);
 
 </script>
