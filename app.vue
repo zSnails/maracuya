@@ -23,18 +23,41 @@
 import ChatButton from '~/components/ChatButton.vue';
 import { Cog6ToothIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
+import { type User } from "@supabase/supabase-js";
 
+const { $listen } = useNuxtApp();
 const user = useSupabaseUser();
 const client = useSupabaseClient<Database>();
-const tmpChats = await client
-  .from("conversations")
-  .select("id, created_at, peer_a:users!conversations_peer_a_fkey(id, email), peer_b:users!conversations_peer_b_fkey(id, email)")
-  .or(`peer_a.eq.${user.value?.id},peer_b.eq.${user.value?.id}`);
 
-const chats = tmpChats.data?.map((elem) => {
-  if (elem.peer_a?.id === user.value?.id)
-    return { id: elem.id, peer: elem.peer_b };
-  return { id: elem.id, peer: elem.peer_a };
+const loadChats = async () => {
+  const tmpChats = await client
+    .from("conversations")
+    .select("id, created_at, peer_a:users!conversations_peer_a_fkey(id, email), peer_b:users!conversations_peer_b_fkey(id, email)")
+    .or(`peer_a.eq.${user.value?.id},peer_b.eq.${user.value?.id}`);
+
+  return tmpChats.data?.map((elem) => {
+    if (elem.peer_a?.id === user.value?.id)
+      return { id: elem.id, peer: elem.peer_b };
+    return { id: elem.id, peer: elem.peer_a };
+  });
+};
+
+
+const chats = ref<{
+  id: number;
+  peer: {
+    id: string | null;
+    email: string | null;
+  } | null;
+}[]>();
+
+if (user.value) {
+  chats.value = await loadChats();
+}
+
+$listen("user:enter", async (usr: User) => {
+  user.value = usr;
+  chats.value = await loadChats();
 });
 
 const selected = ref<number>(0);

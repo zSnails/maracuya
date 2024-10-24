@@ -25,13 +25,19 @@
 <script setup lang="ts">
 import { LockClosedIcon, EnvelopeIcon } from '@heroicons/vue/16/solid';
 
+const { $emit } = useNuxtApp();
+
 const supabase = useSupabaseClient();
 const loginInfo = ref<{ email: string; password: string; }>({ email: '', password: '' });
 const { replace } = useRouter();
 
 const login = async () => {
-  await supabase.auth.signInWithPassword(loginInfo.value);
-  replace("/");
-  window.location.reload()
+  const user = await supabase.auth.signInWithPassword(loginInfo.value);
+  if (user.data && user.data.user) {
+    replace("/");
+    $emit("user:enter", user.data.user);
+    return;
+  }
+  // TODO: show authentication errors
 }
 </script>
