@@ -10,9 +10,13 @@
       </ul>
       <section class="flex flex-row items-center justify-between rounded-box bg-base-300 p-2">
         <div class="dropdown dropdown-top">
-          <div tabindex="0" role="button" class="btn m-1">{{ user.email }}</div>
+          <div tabindex="0" role="button" class="btn m-1">
+            <UserIcon class="size-6" />{{ user.email }}
+          </div>
           <ul tabindex="0" class="dropdown-content menu rounded-box bg-base-100">
-            <li><button @click="signOut" class="btn btn-error btn-sm btn-wide text-white">Log Off</button></li>
+            <li><button @click="signOut" class="btn btn-error btn-sm btn-wide text-white">
+                <ArrowRightStartOnRectangleIcon class="size-6" />Log Off
+              </button></li>
           </ul>
         </div>
         <NuxtLink class="btn btn-square p-2" href="/settings">
@@ -26,7 +30,7 @@
 </template>
 <script setup lang="ts">
 import ChatButton from '~/components/ChatButton.vue';
-import { Cog6ToothIcon } from '@heroicons/vue/16/solid';
+import { Cog6ToothIcon, UserIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/vue/16/solid';
 import type { Database } from '~/types/supabase';
 import { type User } from "@supabase/supabase-js";
 
