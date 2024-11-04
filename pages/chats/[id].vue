@@ -22,9 +22,9 @@
 <script setup lang="ts">
 import { type Message } from '~/message';
 import type { Database } from '~/types/supabase';
-import { formatDistance } from "date-fns";
 import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
 
+const sending = ref(false);
 const messageArea = ref<HTMLTableSectionElement>() as Ref<HTMLTableSectionElement>;
 const messageForm = ref<HTMLFormElement>() as Ref<HTMLFormElement>;
 const attachment = ref<HTMLInputElement>() as Ref<HTMLInputElement>;
@@ -42,13 +42,14 @@ export interface Peer {
 }
 
 const recipient = useAttrs().data as Root | null;
-const user = useSupabaseUser();
 
 const messageContent = ref("");
 const supabase = useSupabaseClient<Database>();
 const sendMessage = async (event: Event) => {
+  if (sending.value) return;
   const formData = new FormData(event.target as HTMLFormElement);
   try {
+    sending.value = true
     await $fetch(`/api/conversations/${route.params.id}/send`, {
       method: "POST",
       body: formData
@@ -58,6 +59,7 @@ const sendMessage = async (event: Event) => {
   } catch (error: any) {
     console.error(error);
   }
+  sending.value = false;
 };
 
 const preloaded = await useFetch(`/api/conversations/${route.params.id}/messages`)
