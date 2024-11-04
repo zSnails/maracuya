@@ -1,5 +1,6 @@
 <template>
-  <div class="chat" :class="{ 'chat-start': msg.sent_by !== user?.id, 'chat-end': msg.sent_by === user?.id }">
+  <div :id="`${msg.sent_by}-${msg.conversation}-${msg.id}`" class="chat"
+    :class="{ 'chat-start': msg.sent_by !== user?.id, 'chat-end': msg.sent_by === user?.id }">
     <div v-if="msg.media" class="chat-header">
       <div v-if="loading"
         class="flex items-center justify-center w-48 h-28 object-scale-down rounded-xl bg-placeholder-primary">
