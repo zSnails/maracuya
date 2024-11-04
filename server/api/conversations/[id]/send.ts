@@ -13,7 +13,7 @@ export default defineEventHandler(async (event: H3Event) => {
     if (fileBody && (fileBody as File).size > 0) {
       const { error, data } = await supabase.storage.from("media").upload(crypto.randomUUID(), fileBody);
       if (error) {
-        return createError(error);
+        throw createError(error);
       }
 
       const { data: dt } = supabase.storage.from("media").getPublicUrl(data.path);
