@@ -151,7 +151,6 @@ export type Database = {
           recovery_token: string | null
           role: string | null
           updated_at: string | null
-          username: string | null
         }
         Insert: {
           aud?: string | null
@@ -189,7 +188,6 @@ export type Database = {
           recovery_token?: string | null
           role?: string | null
           updated_at?: string | null
-          username?: string | null
         }
         Update: {
           aud?: string | null
@@ -227,7 +225,6 @@ export type Database = {
           recovery_token?: string | null
           role?: string | null
           updated_at?: string | null
-          username?: string | null
         }
         Relationships: []
       }
