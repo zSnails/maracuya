@@ -13,14 +13,14 @@ export default defineEventHandler(async (event: H3Event) => {
     if (fileBody && (fileBody as File).size > 0) {
       const { error, data } = await supabase.storage.from("media").upload(crypto.randomUUID(), fileBody);
       if (error) {
-        return sendError(event, error);
+        return createError(error);
       }
 
       const { data: dt } = supabase.storage.from("media").getPublicUrl(data.path);
       mediaUrl = dt.publicUrl;
     }
     const content = formData.get("content");
-    if (mediaUrl === null && content === null) {
+    if (mediaUrl === null && content === "") {
       throw createError({ statusText: "Bad Request", statusCode: 400, message: "attempting to send an empty message" });
     }
 
