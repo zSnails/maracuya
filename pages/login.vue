@@ -32,8 +32,6 @@ import { AuthError } from "@supabase/supabase-js";
 import { LockClosedIcon, EnvelopeIcon, ArrowRightEndOnRectangleIcon } from '@heroicons/vue/16/solid';
 
 const { $emit } = useNuxtApp();
-
-const supabase = useSupabaseClient();
 const loginInfo = ref<{ email: string; password: string; }>({ email: '', password: '' });
 const { replace } = useRouter();
 
@@ -41,12 +39,17 @@ const error = ref<AuthError | null>(null);
 
 const login = async () => {
   error.value = null;
-  const response = await supabase.auth.signInWithPassword(loginInfo.value);
-  if (response.error) {
-    error.value = response.error;
-  } else if (response.data && response.data.user) {
-    $emit("user:enter", response.data.user);
+  try {
+    const response = await $fetch("/api/auth/login", {
+      method: "POST",
+      body: loginInfo.value
+    });
+    $emit("user:enter", response.user);
     await replace("/");
+  } catch (_err: any) {
+    const err = (_err as AuthError);
+    console.error(err);
+    error.value = err;
   }
 }
 </script>
