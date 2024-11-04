@@ -26,6 +26,8 @@ import { formatDistance } from "date-fns";
 import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
 
 const messageArea = ref<HTMLTableSectionElement>() as Ref<HTMLTableSectionElement>;
+const messageForm = ref<HTMLFormElement>() as Ref<HTMLFormElement>;
+const attachment = ref<HTMLInputElement>() as Ref<HTMLInputElement>;
 const messageInput = ref<HTMLInputElement>() as Ref<HTMLInputElement>;
 const route = useRoute();
 
@@ -44,21 +46,18 @@ const user = useSupabaseUser();
 
 const messageContent = ref("");
 const supabase = useSupabaseClient<Database>();
-const sendMessage = async () => {
-  if (messageContent.value.length === 0) return;
-  messageInput.value.disabled = true;
+const sendMessage = async (event: Event) => {
+  const formData = new FormData(event.target as HTMLFormElement);
   try {
     await $fetch(`/api/conversations/${route.params.id}/send`, {
       method: "POST",
-      body: {
-        content: messageContent.value
-      }
+      body: formData
     });
     messageContent.value = "";
-  } catch (error) {
+    messageForm.value.reset();
+  } catch (error: any) {
     console.error(error);
   }
-  messageInput.value.disabled = false;
 };
 
 const preloaded = await useFetch(`/api/conversations/${route.params.id}/messages`)
