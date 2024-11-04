@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware((to) => {
 
   if (to.path === "/login" || to.path === '/register') {
     if (user.value) {
-      return abortNavigation();
+      return abortNavigation("user already logged in");
     }
     return;
   }
