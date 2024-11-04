@@ -9,7 +9,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
   const tmpChats = await supabase
     .from("conversations")
-    .select("id, created_at, peer_a:users!conversations_peer_a_fkey(id, email), peer_b:users!conversations_peer_b_fkey(id, email)")
+    .select("id, created_at, peer_a:users!conversations_peer_a_fkey(id, email, raw_user_meta_data), peer_b:users!conversations_peer_b_fkey(id, email, raw_user_meta_data)")
     .or(`peer_a.eq.${user.id},peer_b.eq.${user.id}`);
 
   const chats = tmpChats.data?.map((elem) => {
