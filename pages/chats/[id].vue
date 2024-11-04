@@ -6,22 +6,14 @@
       </div>
     </nav>
     <section ref="messageArea" class="shadow-inner overflow-auto bg-base-300">
-      <div v-for="(msg, idx) in messages" :key="idx" class="chat"
-        :class="{ 'chat-start': msg.sent_by !== user?.id, 'chat-end': msg.sent_by === user?.id }">
-        <div v-if="msg.media" class="chat-header">
-          <img class="object-scale-down w-48 rounded-xl" :src="msg.media" alt="Some Media">
-        </div>
-        <div class="chat-bubble">{{ msg.content }}</div>
-        <div class="chat-footer">
-          {{ formatDistance(msg.created_at, new Date(), { addSuffix: true }) }}
-        </div>
-      </div>
+      <ChatBubble v-for="(msg, idx) in messages" :key="idx" :msg="msg" />
     </section>
-    <form @submit.prevent="sendMessage" class="join m-5">
-      <input class="file-input join-item bg-base-200" type="file" accept="image/*, video/*">
+    <form @submit.prevent="sendMessage" class="join m-5" ref="messageForm">
+      <input ref="attachment" class="file-input join-item bg-base-200" name="media" type="file"
+        accept="image/*, video/*">
       <div class="input flex items-center justify-between join-item bg-base-200 w-full">
-        <input ref="messageInput" type="text" v-model="messageContent" class="flex-1"
-          :placeholder="`Message @${recipient?.peer?.email}`" required>
+        <input ref="messageInput" type="text" name="content" v-model="messageContent" class="flex-1"
+          :placeholder="`Message @${recipient?.peer?.email}`">
         <PaperAirplaneIcon class="size-6" />
       </div>
     </form>
