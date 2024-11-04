@@ -65,7 +65,7 @@ const sendMessage = async (event: Event) => {
 const preloaded = await useFetch(`/api/conversations/${route.params.id}/messages`)
 const messages = ref(preloaded.data.value?.data);
 
-supabase.channel('schema-db-changes')
+supabase.channel('schema-db-changes') // TODO: this should be placed on the server
   .on(
     'postgres_changes',
     {
