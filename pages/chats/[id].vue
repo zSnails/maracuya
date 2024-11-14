@@ -14,7 +14,8 @@
       <div class="input flex items-center justify-between join-item bg-base-200 w-full">
         <input ref="messageInput" type="text" name="content" v-model="messageContent" class="flex-1"
           :placeholder="`Message @${recipient?.peer?.email}`">
-        <PaperAirplaneIcon class="size-6" />
+        <span v-if="sending" class="loading loading-spinner"></span>
+        <PaperAirplaneIcon v-else class="size-6" />
       </div>
     </form>
   </div>

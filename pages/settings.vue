@@ -14,10 +14,12 @@
               <input type="email" autocomplete="email" class="grow" :placeholder="oldEmail" v-model="email" required />
             </label>
           </div>
+          <p v-if="error" class="text-error">{{ error.message }}</p>
 
           <div class="form-control">
-            <button class="btn btn-primary" type="submit">
-              <ArrowUpOnSquareIcon class="size-6" /> Update
+            <button class="btn btn-primary" :disabled="loading" type="submit">
+              <span class="loading loading-spinner" v-if="loading"></span>
+              <ArrowUpOnSquareIcon v-else class="size-6" /> Update
             </button>
           </div>
         </form>
@@ -31,12 +33,16 @@ const user = useSupabaseUser();
 const oldName = user.value?.user_metadata.display_name;
 const oldEmail = user.value?.email as string;
 const name = ref(oldName || "");
-console.log(name.value);
 const email = ref(oldEmail);
+
+const error = ref<Error | null>(null);
+const loading = ref(false);
 
 const { $emit } = useNuxtApp();
 
 const doUpdate = async () => {
+  loading.value = true;
+
   try {
     const response = await $fetch("/api/me", {
       method: "PUT", body: {
@@ -44,9 +50,12 @@ const doUpdate = async () => {
       }
     });
     $emit("user:enter", response.data.user);
-  } catch (error) {
-    console.error(error);
+  } catch (err: any) {
+    console.error(err);
+    error.value = err;
   }
+
+  loading.value = false;
 };
 
 </script>
