@@ -4,6 +4,14 @@
       <div class="flex-1">
         <a class="btn btn-ghost text-xl">{{ recipient?.peer?.email }}</a>
       </div>
+      <form @submit.prevent="searchMessage">
+        <div class="form-control">
+          <label for="search" class="input flex items-center gap-2">
+            <input v-model="search" type="search" class="grow">
+            <MagnifyingGlassIcon class="size-6" />
+          </label>
+        </div>
+      </form>
     </nav>
     <section ref="messageArea" class="shadow-inner overflow-auto bg-base-300">
       <ChatBubble v-for="(msg, idx) in messages" :key="idx" :msg="msg" />
@@ -23,8 +31,9 @@
 <script setup lang="ts">
 import { type Message } from '~/message';
 import type { Database } from '~/types/supabase';
-import { PaperAirplaneIcon } from '@heroicons/vue/16/solid';
+import { PaperAirplaneIcon, MagnifyingGlassIcon } from '@heroicons/vue/16/solid';
 
+const search = ref<string | null>(null);
 const sending = ref(false);
 const messageArea = ref<HTMLTableSectionElement>() as Ref<HTMLTableSectionElement>;
 const messageForm = ref<HTMLFormElement>() as Ref<HTMLFormElement>;
@@ -43,6 +52,17 @@ export interface Peer {
 }
 
 const recipient = useAttrs().data as Root | null;
+
+const searchMessage = async () => {
+  if (search.value) {
+    for (const node of messageArea.value.childNodes) {
+      if (node.textContent?.toLowerCase().includes(search.value?.toLowerCase())) {
+        //messageArea.value.scrollIntoView
+        (node as HTMLElement).scrollIntoView();
+      }
+    }
+  }
+};
 
 const messageContent = ref("");
 const supabase = useSupabaseClient<Database>();
