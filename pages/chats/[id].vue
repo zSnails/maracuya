@@ -2,7 +2,16 @@
   <div class="grid grid-rows-[auto_1fr_auto] size-full">
     <nav class="navbar">
       <div class="flex-1">
-        <a class="btn btn-ghost text-xl">{{ recipient?.peer?.email }}</a>
+        <div class="dropdown">
+          <div role="button" tabindex="0" class="btn btn-ghost text-xl">{{ recipient?.peer?.email }}</div>
+          <ul tabindex="0" class="menu z-[1] dropdown-content bg-base-100 rounded-box p-2 shadow">
+            <button onclick="my_modal_3.showModal()" class="btn btn-sm btn-wide btn-error text-white">
+              <!-- <button class="btn" onclick="my_modal_3.showModal()">open modal</button> -->
+              <NoSymbolIcon class="size-4" />
+              Block
+            </button>
+          </ul>
+        </div>
       </div>
       <form @submit.prevent="searchMessage">
         <div class="form-control">
@@ -26,12 +35,28 @@
         <PaperAirplaneIcon v-else class="size-6" />
       </div>
     </form>
+    <dialog id="my_modal_3" class="modal">
+      <div class="modal-box">
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <XMarkIcon class="size-6"></XMarkIcon>
+          </button>
+        </form>
+        <h3 class="text-lg font-bold">Are you sure you wish to block this user?</h3>
+        <div class="flex flex-col items-center">
+          <div class="flex flex-row items-center gap-2">
+            <button class="btn" onclick="my_modal_3.close()">Cancel</button>
+            <button class="btn btn-error text-white" @click="blockUser">Confirm</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
   </div>
 </template>
 <script setup lang="ts">
 import { type Message } from '~/message';
 import type { Database } from '~/types/supabase';
-import { PaperAirplaneIcon, MagnifyingGlassIcon } from '@heroicons/vue/16/solid';
+import { PaperAirplaneIcon, MagnifyingGlassIcon, NoSymbolIcon, XMarkIcon } from '@heroicons/vue/16/solid';
 
 const search = ref<string | null>(null);
 const sending = ref(false);
@@ -52,6 +77,16 @@ export interface Peer {
 }
 
 const recipient = useAttrs().data as Root | null;
+
+const blockUser = async () => {
+  try {
+    await $fetch(`/api/users/${recipient?.peer?.id}/block`, { method: "POST" });
+    // @ts-expect-error my_modal_3 exists at runtime
+    my_modal_3.close();
+  } catch (e) {
+    console.error(e);
+  }
+};
 
 const searchMessage = async () => {
   if (search.value) {
@@ -86,7 +121,7 @@ const sendMessage = async (event: Event) => {
 const preloaded = await useFetch(`/api/conversations/${route.params.id}/messages`)
 const messages = ref(preloaded.data.value?.data);
 
-supabase.channel('schema-db-changes') // TODO: this should be placed on the server
+const res = supabase.channel('schema-db-changes') // TODO: this should be placed on the server
   .on(
     'postgres_changes',
     {
@@ -110,6 +145,38 @@ supabase.channel('schema-db-changes') // TODO: this should be placed on the serv
     }
   )
   .subscribe();
+
+/*supabase.channel('schema-db-changes') // TODO: this should be placed on the server
+  .on(
+    'postgres_changes',
+    {
+      event: 'DELETE',
+      schema: 'public',
+      table: 'messages',
+      filter: `conversation=eq.${route.params.id}`,
+    },
+    (payload) => {
+      const scroll = (messageArea.value.scrollTop + messageArea.value.offsetHeight) / messageArea.value.scrollHeight;
+      const msg = (payload.old as Message);
+      //messages.value?.push(payload.old as Message);
+      const idx = messages.value?.findIndex((e) => e.id === msg.id);
+      if (idx) {
+        messages.value?.splice(idx, 1);
+      }
+
+      //if (scroll >= 0.9) {
+      //  nextTick(() => {
+      //    messageArea.value.scroll({
+      //      top: messageArea.value.scrollHeight + 64,
+      //      behavior: "smooth",
+      //    });
+      //  });
+      //}
+
+    }
+  )
+  .subscribe(); */
+
 onMounted(() => {
   messageArea.value.scrollTop = messageArea.value.scrollHeight;
 });
